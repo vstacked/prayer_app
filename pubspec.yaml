@@ -1,0 +1,24 @@
+name: prayer_app
+version: 1.0.0+1
+publish_to: none
+description: A new Flutter project.
+environment:
+  sdk: ">=2.11.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  flutter_html: ^2.1.1
+  font_awesome_flutter: ^9.1.0
+  get: 4.3.0
+  hive: ^2.0.4
+  http: any
+  just_audio: ^0.9.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
