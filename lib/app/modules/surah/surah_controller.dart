@@ -4,6 +4,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:prayer_app/app/data/repositories/surah_repository.dart';
 import 'package:prayer_app/app/data/services/local_storage.dart';
 import 'package:prayer_app/app/models/surah_model.dart';
+import 'package:prayer_app/app/widgets/snackbar.dart';
 
 class SurahController extends GetxController with SingleGetTickerProviderMixin {
   final SurahRepository surahRepository;
@@ -28,6 +29,9 @@ class SurahController extends GetxController with SingleGetTickerProviderMixin {
 
   final _lastRead = SurahModel().obs;
   SurahModel get lastRead => this._lastRead.value;
+
+  final _hidePlayButton = false.obs;
+  bool get hidePlayButton => this._hidePlayButton.value;
 
   final _isErrorSurah = false.obs;
   bool get isErrorSurah => this._isErrorSurah.value;
@@ -56,6 +60,18 @@ class SurahController extends GetxController with SingleGetTickerProviderMixin {
     }
   }
 
+  Future<bool> _setAudio(String url) async {
+    try {
+      Uri uri = Uri.parse(url).replace(scheme: 'https');
+      await audioPlayer.setUrl(uri.toString());
+      await audioPlayer.load();
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
   void onBackPress(String surahNumber) async {
     //* Force stop audio
     if (audioPlayer.playing) {
@@ -66,10 +82,9 @@ class SurahController extends GetxController with SingleGetTickerProviderMixin {
     //* Update lastRead
     if (_offset.value != 0) _lastRead.value = surah.firstWhere((element) => element.nomor == surahNumber);
 
-    // TODO
     //* Save current ayat & offset to db
-    // LocalStorage.put('surahNumber', lastRead.nomor);
-    // LocalStorage.put('offset', _offset);
+    await LocalStorage.put('surahNumber', lastRead.nomor);
+    await LocalStorage.put('offset', _offset.value);
 
     //* Clear current ayat & offset
     ayat.clear();
@@ -80,23 +95,28 @@ class SurahController extends GetxController with SingleGetTickerProviderMixin {
 
   void getAyat(int i, {bool isLastRead = false}) async {
     _isErrorDetail(false);
+    _hidePlayButton(false);
 
     int indexSurah = isLastRead ? surah.indexWhere((element) => element.nama == lastRead.nama) : i;
 
     SurahModel _surah = surah[indexSurah];
-    Uri uri = Uri.parse(_surah.audio).replace(scheme: 'https');
 
     final data = await surahRepository.getDetailSurah(surah: _surah.nomor);
     if (data != null) {
-      await audioPlayer.setUrl(uri.toString());
-      await audioPlayer.load();
+      if (!(await _setAudio(_surah.audio))) {
+        _hidePlayButton(true);
+        showSnackbar(title: 'Error', message: 'Can\'t load audio..');
+      }
 
       ayat.assignAll(data);
 
       final String surahNumber = await LocalStorage.get('surahNumber');
       final double offset = await LocalStorage.get('offset');
 
-      if (surahNumber == _surah.nomor && offset != null) detailSurahScrollController.jumpTo(offset);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (surahNumber == _surah.nomor && offset != null && detailSurahScrollController.hasClients)
+          detailSurahScrollController.jumpTo(offset);
+      });
     } else
       _isErrorDetail(true);
   }
@@ -111,7 +131,7 @@ class SurahController extends GetxController with SingleGetTickerProviderMixin {
       surah.assignAll(data);
 
       //* Assign lastRead
-      _lastRead.value = surah.firstWhere((element) => element.nomor == surahNumber);
+      if (surah.isNotEmpty) _lastRead.value = surah.firstWhere((element) => element.nomor == surahNumber);
     } else
       _isErrorSurah(true);
   }

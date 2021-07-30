@@ -33,21 +33,26 @@ class DetailSurah extends GetView<SurahController> {
           ),
           actions: [
             Obx(
-              () => Opacity(
-                opacity: controller.opacityPlayButton,
-                child: IconButton(
-                  onPressed: controller.opacityPlayButton == 1 ? controller.playAudio : null,
-                  icon: DecoratedBox(
-                    decoration: BoxDecoration(border: Border.all(color: mainColor, width: 2.0), shape: BoxShape.circle),
-                    child: AnimatedIcon(
-                      icon: AnimatedIcons.play_pause,
-                      progress: controller.animationController,
-                      color: mainColor,
+              () {
+                if (!controller.hidePlayButton)
+                  return Opacity(
+                    opacity: controller.opacityPlayButton,
+                    child: IconButton(
+                      onPressed: controller.opacityPlayButton == 1 ? controller.playAudio : null,
+                      icon: DecoratedBox(
+                        decoration:
+                            BoxDecoration(border: Border.all(color: mainColor, width: 2.0), shape: BoxShape.circle),
+                        child: AnimatedIcon(
+                          icon: AnimatedIcons.play_pause,
+                          progress: controller.animationController,
+                          color: mainColor,
+                        ),
+                      ),
+                      iconSize: 30,
                     ),
-                  ),
-                  iconSize: 30,
-                ),
-              ),
+                  );
+                return const SizedBox();
+              },
             ),
           ],
           centerTitle: true,
@@ -161,19 +166,22 @@ class DetailSurah extends GetView<SurahController> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  GestureDetector(
-                    onTap: controller.playAudio,
-                    child: CircleAvatar(
-                      radius: 35,
-                      backgroundColor: Colors.white.withOpacity(.75),
-                      child: AnimatedIcon(
-                        icon: AnimatedIcons.play_pause,
-                        progress: controller.animationController,
-                        color: mainColor,
-                        size: 45,
+                  if (!controller.hidePlayButton)
+                    GestureDetector(
+                      onTap: controller.playAudio,
+                      child: CircleAvatar(
+                        radius: 35,
+                        backgroundColor: Colors.white.withOpacity(.75),
+                        child: AnimatedIcon(
+                          icon: AnimatedIcons.play_pause,
+                          progress: controller.animationController,
+                          color: mainColor,
+                          size: 45,
+                        ),
                       ),
-                    ),
-                  ),
+                    )
+                  else
+                    const CircleAvatar(radius: 35, backgroundColor: Colors.transparent),
                 ],
               ),
             )
