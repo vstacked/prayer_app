@@ -2,6 +2,8 @@ import 'package:get/get.dart';
 
 import 'package:prayer_app/app/modules/home/home_binding.dart';
 import 'package:prayer_app/app/modules/home/home_view.dart';
+import 'package:prayer_app/app/modules/solat_times/solat_times_binding.dart';
+import 'package:prayer_app/app/modules/solat_times/solat_times_view.dart';
 import 'package:prayer_app/app/modules/surah/surah_binding.dart';
 import 'package:prayer_app/app/modules/surah/surah_view.dart';
 
@@ -22,6 +24,11 @@ class AppPages {
       name: _Paths.SURAH,
       page: () => SurahView(),
       binding: SurahBinding(),
+    ),
+    GetPage(
+      name: _Paths.SOLAT_TIMES,
+      page: () => SolatTimesView(),
+      binding: SolatTimesBinding(),
     ),
   ];
 }

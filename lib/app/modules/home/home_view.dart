@@ -43,7 +43,7 @@ class HomeView extends GetView<HomeController> {
                 icon: Icons.schedule,
                 title: 'Solat Times',
                 onPress: () {
-                  print('data2');
+                  Get.toNamed(Routes.SOLAT_TIMES);
                 },
               ),
             ],

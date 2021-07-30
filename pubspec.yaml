@@ -12,9 +12,11 @@ dependencies:
   flutter_html: ^2.1.1
   font_awesome_flutter: ^9.1.0
   get: 4.3.0
+  geocoding:
   hive: ^2.0.4
   http: any
   just_audio: ^0.9.4
+  location: ^4.3.0
   path_provider: ^2.0.2
 
 dev_dependencies:

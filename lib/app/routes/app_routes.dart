@@ -6,9 +6,11 @@ abstract class Routes {
 
   static const HOME = _Paths.HOME;
   static const SURAH = _Paths.SURAH;
+  static const SOLAT_TIMES = _Paths.SOLAT_TIMES;
 }
 
 abstract class _Paths {
   static const HOME = '/home';
   static const SURAH = '/surah';
+  static const SOLAT_TIMES = '/solat-times';
 }

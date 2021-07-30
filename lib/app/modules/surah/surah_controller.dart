@@ -149,10 +149,7 @@ class SurahController extends GetxController with SingleGetTickerProviderMixin {
   @override
   void onReady() {
     surahScrollController.addListener(() {
-      if (surahScrollController.offset >= 400)
-        _isScrolled(true);
-      else
-        _isScrolled(false);
+      _isScrolled(surahScrollController.offset >= 400);
     });
     detailSurahScrollController.addListener(() {
       _offset.value = detailSurahScrollController.offset;
