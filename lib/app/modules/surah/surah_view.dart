@@ -19,11 +19,17 @@ class SurahView extends GetView<SurahController> {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
+      floatingActionButton: Obx(() {
+        if (controller.isScrolled)
+          return FloatingActionButton(onPressed: controller.scrollToTop, child: const Icon(Icons.arrow_upward));
+        return const SizedBox();
+      }),
       body: Obx(
         () {
-          if (controller.isError) return const SizedBox();
+          if (controller.isErrorSurah) return const SizedBox();
           if (controller.surah.isEmpty) return Loading();
           return SingleChildScrollView(
+            controller: controller.surahScrollController,
             child: Column(
               children: [
                 const SizedBox(height: 25),
@@ -63,7 +69,7 @@ class SurahView extends GetView<SurahController> {
                         style: Get.textTheme.subtitle1.copyWith(fontWeight: FontWeight.w600, color: mainColor),
                       ),
                       onTap: () {
-                        controller.getAyat(i, surah.ayat);
+                        controller.getAyat(i);
                         Get.to(
                           () => DetailSurah(
                             number: surah.nomor,
@@ -87,11 +93,15 @@ class SurahView extends GetView<SurahController> {
   Widget _lastRead() {
     return GestureDetector(
       onTap: () {
-        Uri _uri = Uri.parse("https://al-quran-8d642.firebaseio.com").replace(
-          queryParameters: {"print": "pretty"},
-          pathSegments: ['asd', 'data.json'],
+        controller.getAyat(0, isLastRead: true);
+        Get.to(
+          () => DetailSurah(
+            number: controller.lastRead.nomor,
+            name: controller.lastRead.nama,
+            meaning: controller.lastRead.arti,
+            audio: controller.lastRead.audio,
+          ),
         );
-        print(_uri);
       },
       child: Container(
         height: 130,
@@ -128,23 +138,18 @@ class SurahView extends GetView<SurahController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Al-Faatiha',
+                        controller.lastRead.nama ?? '',
                         style: Get.textTheme.bodyText1.copyWith(color: Colors.white),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        'The Opening',
+                        controller.lastRead.arti ?? '',
                         style: Get.textTheme.caption.copyWith(color: Colors.white.withOpacity(.75)),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
-                  ),
-                  Text(
-                    'Verse No: 3',
-                    style: Get.textTheme.caption
-                        .copyWith(color: Colors.white.withOpacity(.5), fontWeight: FontWeight.bold),
                   ),
                 ],
               ),

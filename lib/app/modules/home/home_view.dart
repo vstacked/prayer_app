@@ -58,18 +58,18 @@ class HomeView extends GetView<HomeController> {
     return GestureDetector(
       onTap: onPress,
       child: Container(
-        height: 100,
+        height: 75,
         padding: const EdgeInsets.all(8.0),
         margin: const EdgeInsets.symmetric(horizontal: 12.0),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
         child: Row(
           children: [
             SizedBox(
-              height: 66,
-              width: 66,
+              height: 50,
+              width: 50,
               child: DecoratedBox(
                 decoration: BoxDecoration(color: mainColor, borderRadius: BorderRadius.circular(7.5)),
-                child: Center(child: FaIcon(icon, size: 36, color: Colors.white)),
+                child: Center(child: FaIcon(icon, size: 30, color: Colors.white)),
               ),
             ),
             const SizedBox(width: 20),

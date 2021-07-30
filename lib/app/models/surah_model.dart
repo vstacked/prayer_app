@@ -18,16 +18,16 @@ class SurahModel {
     this.urut,
   });
 
-  final String arti;
-  final String asma;
-  final String audio;
-  final int ayat;
-  final String keterangan;
-  final String nama;
-  final String nomor;
-  final String rukuk;
-  final String type;
-  final String urut;
+  String arti;
+  String asma;
+  String audio;
+  int ayat;
+  String keterangan;
+  String nama;
+  String nomor;
+  String rukuk;
+  String type;
+  String urut;
 
   factory SurahModel.fromRawJson(String str) => SurahModel.fromJson(json.decode(str));
 
