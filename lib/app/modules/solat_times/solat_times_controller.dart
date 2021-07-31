@@ -98,20 +98,27 @@ class SolatTimesController extends GetxController {
   }
 
   void _searchCity(List<String> split) async {
-    List<CityModel> _cities = [];
+    List<Map<String, dynamic>> _cities = [];
     int count = 0;
 
     for (var item in split) {
       final res = await solatRepository.getCityBySearch(item);
       if (res != null) {
         count++;
-        _cities.add(res.first);
+        _cities.add({"city": res.first, "lengthTotal": res.length});
       }
     }
 
     if (count == 0) return _setIsError();
 
-    if (_cities.isNotEmpty) _getSolatTimesByDay(_cities.first.id);
+    //* MAYBE STILL HAVE SOME BUGS
+    if (_cities.isNotEmpty) {
+      _cities.removeWhere((element) => element['lengthTotal'] == 0);
+
+      _cities.sort((a, b) => (a['lengthTotal'] as int).compareTo(b['lengthTotal']));
+
+      _getSolatTimesByDay((_cities.first['city'] as CityModel).id);
+    }
   }
 
   void _getCurrentLocation() async {
