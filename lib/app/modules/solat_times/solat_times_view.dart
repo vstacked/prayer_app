@@ -12,13 +12,15 @@ class SolatTimesView extends GetView<SolatTimesController> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Solat Times', style: Get.textTheme.headline6.copyWith(color: mainColor)),
-        leading: BackButton(color: mainColor),
+        leading: const BackButton(color: mainColor),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
+      backgroundColor: backgroundColor,
       body: Obx(
         () {
+          if (controller.isError) return const SizedBox();
           if (controller.isLoading) return const Loading();
           return ListView(
             children: [
@@ -60,7 +62,7 @@ class SolatTimesView extends GetView<SolatTimesController> {
                 itemCount: controller.schedules.length,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 itemBuilder: (_, i) {
-                  final schedule = controller.schedules.entries.toList()[i];
+                  final schedule = controller.schedules[i];
                   return Container(
                     height: 76,
                     margin: const EdgeInsets.only(bottom: 10),
@@ -70,8 +72,7 @@ class SolatTimesView extends GetView<SolatTimesController> {
                       children: [
                         Row(
                           children: [
-                            // TODO ICON
-                            Icon(Icons.ac_unit, color: Colors.white),
+                            Icon(Icons.schedule_outlined, color: Colors.white),
                             const SizedBox(width: 18),
                             Text(
                               schedule.key,

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
@@ -13,20 +15,27 @@ class SolatTimesController extends GetxController {
   final _isLoading = false.obs;
   bool get isLoading => this._isLoading.value;
 
-  // TODO check error
   final _isError = false.obs;
   bool get isError => this._isError.value;
 
   final _solatTimesModel = SolatTimesModel().obs;
 
+  Timer _timer;
+
   final _minutesToGo = <String, String>{}.obs;
   Map<String, String> get minutesToGo => this._minutesToGo;
 
   String get location => "${_solatTimesModel.value.lokasi}, ${_solatTimesModel.value.daerah}";
-  // TODO FORMAT DATE
-  String get date => "${_solatTimesModel.value.jadwal.tanggal}";
+
+  String get date {
+    String _month = _solatTimesModel.value.jadwal.tanggal.split(', ').last.split('/')[1];
+    String _result =
+        _solatTimesModel.value.jadwal.tanggal.replaceAll('/$_month/', ' ${_months[int.tryParse(_month) - 1]} ');
+    return _result;
+  }
+
   Jadwal get _schedule => _solatTimesModel.value.jadwal;
-  Map<String, String> get schedules => {
+  Map<String, String> get _schedulesAsMap => {
         "Imsak": _schedule.imsak,
         "Subuh": _schedule.subuh,
         "Terbit": _schedule.terbit,
@@ -36,33 +45,55 @@ class SolatTimesController extends GetxController {
         "Maghrib": _schedule.maghrib,
         "Isya": _schedule.isya
       };
+  List<MapEntry<String, String>> get schedules => _schedulesAsMap.entries.toList();
 
-  void _minutes() {
+  void _formatTimeSchedule() {
     DateTime _time = DateTime.now();
+    List<int> _timeInMinutes = [];
 
-    for (var item in schedules.entries.toList()) {
+    for (var item in schedules) {
       List<String> times = item.value.split(':');
       Duration _duration = DateTime(_time.year, _time.month, _time.day, int.parse(times[0]), int.parse(times[1]))
           .difference(DateTime.now());
-      if (!_duration.isNegative) {
-        // TODO FORMAT IN HOUR AND MINUTE
-        _minutesToGo.value = {"title": item.key, "time": item.value, "diff": "${_duration.inMinutes}"};
-        break;
-      }
+
+      _timeInMinutes.add(_duration.inMinutes);
     }
+
+    List<bool> _timePassed = _timeInMinutes.map((e) => e.isNegative).toList();
+
+    //* false means time is passed
+    if (_timePassed.contains(false)) {
+      int _minute = _timeInMinutes.firstWhere((element) => element > 0);
+      int _index = _timeInMinutes.indexWhere((element) => element == _minute);
+
+      _minutesToGo.value = {"title": schedules[_index].key, "time": schedules[_index].value, "diff": "$_minute"};
+    } else
+      _minutesToGo.value = {
+        "title": schedules.first.key,
+        "time": schedules.first.value,
+        "diff": "${_timeInMinutes.first.abs()}"
+      };
+  }
+
+  void _setIsError() {
+    showSnackbar(title: 'Error Occured', message: 'Data not found..');
+    _isError(true);
+    return;
   }
 
   void _getSolatTimesByDay(String idCity) async {
     DateTime _time = DateTime.now();
     final res = await solatRepository.getSolatTimesDay(
-      idCity: idCity,
-      day: "${_time.day}",
-      month: "${_time.month}",
-      year: "${_time.year}",
-    );
+        idCity: idCity, day: "${_time.day}", month: "${_time.month}", year: "${_time.year}");
+
+    if (res == null) return _setIsError();
 
     _solatTimesModel.value = res;
-    _minutes();
+    _formatTimeSchedule();
+
+    _timer = Timer.periodic(1.minutes, (timer) {
+      _formatTimeSchedule();
+    });
     _isLoading(false);
   }
 
@@ -78,12 +109,17 @@ class SolatTimesController extends GetxController {
       }
     }
 
-    if (count == 0) showSnackbar(title: 'Error Occured', message: 'Data not found..');
+    if (count == 0) return _setIsError();
+
     if (_cities.isNotEmpty) _getSolatTimesByDay(_cities.first.id);
   }
 
   void _getCurrentLocation() async {
     final res = await LocationService.determinePosition();
+    if (res == null) {
+      _isError(true);
+      return;
+    }
     List<Placemark> placemarks = await placemarkFromCoordinates(res.latitude, res.longitude);
     _searchCity(placemarks.first.subAdministrativeArea.split(' '));
   }
@@ -94,4 +130,25 @@ class SolatTimesController extends GetxController {
     _getCurrentLocation();
     super.onInit();
   }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
 }
+
+const List<String> _months = [
+  'Januari',
+  'Februari',
+  'Maret',
+  'April',
+  'Mei',
+  'Juni',
+  'Juli',
+  'Agustus',
+  'September',
+  'Oktober',
+  'November',
+  'Desember'
+];

@@ -16,7 +16,7 @@ class LocationService {
     if (!serviceEnabled) {
       serviceEnabled = await _location.requestService();
       if (!serviceEnabled) {
-        showSnackbar(message: 'Location services are disabled...');
+        showSnackbar(title: 'Error Occured', message: 'Location services are disabled...');
         return null;
       }
     }
@@ -25,13 +25,16 @@ class LocationService {
     if (_permissionGranted == PermissionStatus.denied) {
       _permissionGranted = await _location.requestPermission();
       if (_permissionGranted == PermissionStatus.denied) {
-        showSnackbar(message: 'Location permissions are denied...');
+        showSnackbar(title: 'Error Occured', message: 'Location permissions are denied...');
         return null;
       }
     }
 
     if (_permissionGranted == PermissionStatus.deniedForever) {
-      showSnackbar(message: 'Location permissions are permanently denied, we cannot request permissions...');
+      showSnackbar(
+        title: 'Error Occured',
+        message: 'Location permissions are permanently denied, we cannot request permissions...',
+      );
       return null;
     }
 

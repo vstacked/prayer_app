@@ -14,11 +14,12 @@ class SurahView extends GetView<SurahController> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Surah', style: Get.textTheme.headline6.copyWith(color: mainColor)),
-        leading: BackButton(color: mainColor),
+        leading: const BackButton(color: mainColor),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
+      backgroundColor: backgroundColor,
       floatingActionButton: Obx(() {
         if (controller.isScrolled)
           return FloatingActionButton(onPressed: controller.scrollToTop, child: const Icon(Icons.arrow_upward));

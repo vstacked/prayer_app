@@ -59,6 +59,7 @@ class DetailSurah extends GetView<SurahController> {
           backgroundColor: Colors.transparent,
           elevation: 0,
         ),
+        backgroundColor: backgroundColor,
         body: Obx(
           () {
             if (controller.isErrorDetail) return const SizedBox();

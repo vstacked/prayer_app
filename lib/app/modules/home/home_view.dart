@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:get/get.dart';
+import 'package:prayer_app/app/modules/about/about_view.dart';
 import 'package:prayer_app/app/routes/app_pages.dart';
 import 'package:prayer_app/app/utils/app_colors.dart';
 
@@ -17,7 +18,7 @@ class HomeView extends GetView<HomeController> {
         actions: [
           IconButton(
             onPressed: () {
-              print('about');
+              Get.to(const AboutView());
             },
             icon: Icon(Icons.info_outline, color: mainColor),
             iconSize: 25,
@@ -28,7 +29,7 @@ class HomeView extends GetView<HomeController> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          FaIcon(FontAwesomeIcons.mosque, color: mainColor, size: 115),
+          const FaIcon(FontAwesomeIcons.mosque, color: mainColor, size: 115),
           Column(
             children: [
               _menu(
